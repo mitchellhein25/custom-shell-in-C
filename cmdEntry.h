@@ -17,19 +17,20 @@ struct cmdEntry
 struct cmdEntry* createCmdEntry(char* line)
 {
     struct cmdEntry* currCmdEntry = malloc(sizeof(struct cmdEntry));
-
     currCmdEntry->command = malloc(2048);
     currCmdEntry->command = NULL;
 
     // initialize array of arguments (up to 512)
     currCmdEntry->args = malloc(512 * sizeof(char*)); 
+    
     if (currCmdEntry->args){
         for (int i = 0; i < 512; i++) {
         currCmdEntry->args[i] = malloc(255 * sizeof *currCmdEntry->args[i]);
         currCmdEntry->args[i] = NULL;
         }
     }
-
+    
+    //Initialize variables/properties
     currCmdEntry->inputFile = malloc(2048); 
     currCmdEntry->inputFile = NULL;
     currCmdEntry->outputFile = malloc(2048);
@@ -41,42 +42,41 @@ struct cmdEntry* createCmdEntry(char* line)
     char* command = strtok(line, " ");
     currCmdEntry->command = calloc(strlen(command) + 1, sizeof(char));
     strcpy(currCmdEntry->command, command);
-    // printf("commans");
-    // printf("command: %s", currCmdEntry->command);
 
-    // char* currArg = strtok(NULL, " ");
-    // currCmdEntry->args[0] = currArg;
-
-    // printf("first argument: %s\n", currArg);
-
+    //The first argument in the args array will also be the command
+    currCmdEntry->args[0] = currCmdEntry->command;
     char* currArg = strtok(NULL, " ");
-    int x = 0;
-    // printf("currArg");
+    int x = 1;
+    //Iterate through all of the arguments
     while (currArg != NULL) {
-        // printf("currArg");
+
+        //If < is encountered, next arg is the input file
         if (strcmp(currArg, "<") == 0) {
             currArg = strtok(NULL, " ");
             currCmdEntry->inputFile = currArg;
             currArg = strtok(NULL, " ");
-            if (currArg != NULL) {
+            if (currArg == NULL) {
                 continue;
             }
         }
 
+        //If > is encountered, next arg is the output file
         if (strcmp(currArg, ">") == 0) {
             currArg = strtok(NULL, " ");
             currCmdEntry->outputFile = currArg;
             currArg = strtok(NULL, " ");
-            if (currArg != NULL) {
+            if (currArg == NULL) {
                 continue;
             }
         }
         
+        //If & is encountered, process will run in background, so we set foreBack to true
         if (strcmp(currArg, "&") == 0) {
             currCmdEntry->foreBack = true;
             break;
         }
 
+        //If no special case met, add arg to the args array and go to next argument
         currCmdEntry->args[x] = currArg;
         currArg = strtok(NULL, " ");
         x++;
@@ -85,18 +85,15 @@ struct cmdEntry* createCmdEntry(char* line)
     return currCmdEntry;
 }
 
+//This was a helper function to print out the command entry, not actually used in finished product
 void printCommand(struct cmdEntry* cmdCurr) {
-      printf("command: %s\n", cmdCurr->command);
+    fprintf(stdout, "command: %s\n", cmdCurr->command);
     int i = 0;
     while (cmdCurr->args[i] != NULL){
-        printf("arg %d: %s\n", i, cmdCurr->args[i]);
+         fprintf(stdout, "arg %d: %s\n", i, cmdCurr->args[i]);
         i++;
     }
-    if (cmdCurr->inputFile != NULL) {
-        printf("inputFile: %s\n", cmdCurr->inputFile);
-    }
-    if (cmdCurr->outputFile != NULL) {
-        printf("outputFile: %s\n", cmdCurr->outputFile);
-    }
-    printf("foreBack: %d\n", cmdCurr->foreBack);
+    fprintf(stdout, "inputFile: %s\n", cmdCurr->inputFile);
+    fprintf(stdout, "outputFile: %s\n", cmdCurr->outputFile);
+    fprintf(stdout, "foreBack: %d\n", cmdCurr->foreBack);
 }
