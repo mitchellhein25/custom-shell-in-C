@@ -5,5 +5,6 @@ COMMAND 1 (Compile):
 gcc --std=gnu99 -g3 -Wall -o smallsh main.c
 
 COMMAND 2 (run shell):
+
 smallsh
 
